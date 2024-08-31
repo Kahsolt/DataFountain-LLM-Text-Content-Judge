@@ -13,10 +13,11 @@ Team Name: 你也是龙
 - ???
 
 
-#### refenrence
+### Experiments
 
-- ???
-
+| method | submit score ↑ |
+| :-: | :-: |
+| random | 0.42964554243 |
 
 ----
 by Armit
