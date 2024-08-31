@@ -17,7 +17,7 @@ Team Name: 你也是龙
 
 | method | submit score ↑ |
 | :-: | :-: |
-| random | 0.42964554243 |
+| random | 0.43252595156 |
 
 ----
 by Armit
