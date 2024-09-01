@@ -1,2 +1,2 @@
 transformers
-peft
+sentence_transformers

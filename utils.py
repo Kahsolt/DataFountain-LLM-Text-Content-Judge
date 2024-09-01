@@ -9,6 +9,8 @@ from pathlib import Path
 from collections import Counter
 from typing import Tuple, List
 
+import torch
+
 BASE_PATH = Path(__file__).parent
 DATA_PATH = BASE_PATH / 'data'
 OUT_PATH = BASE_PATH / 'out'
@@ -38,6 +40,8 @@ DIM_MAPPING = {
 
 Sample = Tuple[str, str, str, str, int]   # ([0]id, [1]quest, [2]judge_dim, [3]content, [4]score)
 Dataset = List[Sample]
+
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
 def load_train_data() -> Dataset:
