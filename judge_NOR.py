@@ -6,7 +6,7 @@
 
 from utils import *
 
-R_NOR_TASK = Regex('请以“.+”为主题写一篇文章')
+R_NOR_TASK = Regex('请以“(.+)”为主题写一篇文章')
 
 
 def judge_NOR_dummy(test_data:Dataset) -> Dataset:

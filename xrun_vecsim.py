@@ -31,7 +31,7 @@ PRETRAINED_CHECKPOINTS = [
   'mixedbread-ai/mxbai-embed-large-v1',
 ]
 
-model_name = 'all-MiniLM-L6-v2'
+model_name = 'paraphrase-multilingual-MiniLM-L12-v2'
 model = SentenceTransformer(model_name, device=device)
 
 try:

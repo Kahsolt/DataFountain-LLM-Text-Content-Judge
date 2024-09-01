@@ -10,6 +10,7 @@ from collections import Counter
 from typing import Tuple, List
 
 import torch
+import numpy as np
 
 BASE_PATH = Path(__file__).parent
 DATA_PATH = BASE_PATH / 'data'
