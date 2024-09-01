@@ -2,9 +2,6 @@
 .vscode/
 __pycache__/
 
-# generated
-out/
-
 # logs
 log/
 *.log

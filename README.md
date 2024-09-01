@@ -10,7 +10,7 @@ Team Name: 你也是龙
 
 ### Quickstart
 
-- ???
+- `python judge.py`
 
 
 ### Experiments

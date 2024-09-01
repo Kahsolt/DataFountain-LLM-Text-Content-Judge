@@ -3,7 +3,10 @@
 # Create Time: 2024/08/31 
 
 import csv
+import re
+from re import compile as Regex
 from pathlib import Path
+from collections import Counter
 from typing import Tuple, List
 
 BASE_PATH = Path(__file__).parent
@@ -33,7 +36,7 @@ DIM_MAPPING = {
   'CHC': '选择题',
 }
 
-Sample = Tuple[str, str, str, str, int]   # (id, quest, judge_dim, content, score)
+Sample = Tuple[str, str, str, str, int]   # ([0]id, [1]quest, [2]judge_dim, [3]content, [4]score)
 Dataset = List[Sample]
 
 
@@ -49,6 +52,7 @@ def load_train_data() -> Dataset:
       id, quest, dim, content, score = segs
       assert dim in DIM_LIST, breakpoint()
       samples.append((id, quest, dim, content, int(score)))
+  print('len(train_data):', len(samples))
   return samples
 
 def load_test_data() -> Dataset:
@@ -63,6 +67,7 @@ def load_test_data() -> Dataset:
       id, quest, dim, content = segs
       assert dim in DIM_LIST, breakpoint()
       samples.append([id, quest, dim, content, None])   # use list here to allow inplace-modify :)
+  print('len(test_data):', len(samples))
   return samples
 
 def save_infer_data(samples:Dataset, fp:Path=None):
@@ -79,3 +84,12 @@ def save_infer_data(samples:Dataset, fp:Path=None):
   with open(fp, 'w', encoding=FILE_ENCODING, newline='') as fh:
     writer = csv.writer(fh)
     writer.writerows(data)
+
+
+def samples_to_probdist(nums:List[int]) -> Tuple[List[int], List[float]]:
+  cntr = Counter(nums)
+  nums = sorted(cntr.keys())
+  freq = [cntr[n] for n in nums]
+  tot = sum(freq)
+  prob = [e / tot for e in freq] 
+  return nums, prob
