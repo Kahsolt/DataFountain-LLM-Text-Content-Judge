@@ -46,6 +46,13 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 mean = lambda x: sum(x) / len(x) if len(x) else 0.0
 
 
+def _raw_data_sanity_check(samples:Dataset):
+  ''' 仅 规范性NOR 有空缺: 25(train)/24(test)，标签都是 5 分'''
+  print('>> [_raw_data_sanity_check] Empty llm output samples:')
+  for dim in DIM_LIST:
+    badcase = [e for e in samples if e[2] == dim and len(e[3]) == 0]
+    print(f'  {dim}: {len(badcase)}')
+
 def load_train_data(filter:str=None) -> Dataset:
   with open(TRAIN_DATA_FILE, encoding=FILE_ENCODING) as fh:
     samples: Dataset = []
@@ -62,6 +69,7 @@ def load_train_data(filter:str=None) -> Dataset:
     dim_kanji = DIM_MAPPING[filter]
     samples = [e for e in samples if e[2] == dim_kanji]
   print('len(train_data):', len(samples))
+  #_raw_data_sanity_check(samples)
   return samples
 
 def load_test_data(filter:str=None) -> Dataset:
@@ -80,6 +88,7 @@ def load_test_data(filter:str=None) -> Dataset:
     dim_kanji = DIM_MAPPING[filter]
     samples = [e for e in samples if e[2] == dim_kanji]
   print('len(test_data):', len(samples))
+  #_raw_data_sanity_check(samples)
   return samples
 
 def save_infer_data(samples:Dataset, fp:Path=None):
