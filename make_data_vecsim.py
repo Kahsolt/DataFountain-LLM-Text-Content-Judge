@@ -101,14 +101,18 @@ def make_vecsim_socre(samples:DSamples):
   save_file(samples)
 
 
+def load_file() -> DSamples:
+  with open(DATA_TRAIN_FILE, encoding='utf-8') as fh:
+    return json.load(fh)
+
+
 def save_file(samples:DSamples):
   with open(DATA_TRAIN_FILE, 'w', encoding='utf-8') as fh:
     json.dump(samples, fh, indent=2, ensure_ascii=False)
 
 
 def run():
-  data = load_train_data()
-  data = [it for it in data if it[2] == DIM_NOR]
+  data = load_train_data('NOR')
   print('n_samples:', len(data))
 
   if DATA_TRAIN_FILE.exists():

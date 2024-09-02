@@ -46,7 +46,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 mean = lambda x: sum(x) / len(x) if len(x) else 0.0
 
 
-def load_train_data() -> Dataset:
+def load_train_data(filter:str=None) -> Dataset:
   with open(TRAIN_DATA_FILE, encoding=FILE_ENCODING) as fh:
     samples: Dataset = []
     is_first = True
@@ -58,10 +58,13 @@ def load_train_data() -> Dataset:
       id, quest, dim, content, score = segs
       assert dim in DIM_LIST, breakpoint()
       samples.append((id, quest, dim, content, int(score)))
+  if filter is not None:
+    dim_kanji = DIM_MAPPING[filter]
+    samples = [e for e in samples if e[2] == dim_kanji]
   print('len(train_data):', len(samples))
   return samples
 
-def load_test_data() -> Dataset:
+def load_test_data(filter:str=None) -> Dataset:
   with open(TEST_DATA_FILE, encoding=FILE_ENCODING) as fh:
     samples: Dataset = []
     is_first = True
@@ -73,6 +76,9 @@ def load_test_data() -> Dataset:
       id, quest, dim, content = segs
       assert dim in DIM_LIST, breakpoint()
       samples.append([id, quest, dim, content, None])   # use list here to allow inplace-modify :)
+  if filter is not None:
+    dim_kanji = DIM_MAPPING[filter]
+    samples = [e for e in samples if e[2] == dim_kanji]
   print('len(test_data):', len(samples))
   return samples
 
