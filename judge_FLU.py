@@ -7,7 +7,15 @@
 from utils import *
 
 
-def judge_FLU_dummy(test_data:Dataset) -> Dataset:
+def judge_FLU_mean(test_data:Dataset) -> Dataset:
+  for segs in test_data:
+    id, quest, dim, content, score = segs
+    if dim == DIM_FLU:
+      segs[-1] = 3.1726666666666667
+  return test_data
+
+
+def judge_FLU_random(test_data:Dataset) -> Dataset:
   # load data
   train_data = load_train_data()
   # analyze statis
@@ -17,6 +25,7 @@ def judge_FLU_dummy(test_data:Dataset) -> Dataset:
     if dim == DIM_FLU:
       scores_FLU.append(score)
   sc_FLU, p_FLU = samples_to_probdist(scores_FLU)
+  print('mean(sc_FLU):', mean(scores_FLU))    # mean diff: 0.8579822222222222
   print('p_FLU:', [round(e, 2) for e in p_FLU])
   # random baseline solution
   for segs in test_data:

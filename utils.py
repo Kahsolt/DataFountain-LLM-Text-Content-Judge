@@ -43,6 +43,7 @@ Sample = Tuple[str, str, str, str, int]   # ([0]id, [1]quest, [2]judge_dim, [3]c
 Dataset = List[Sample]
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
+mean = lambda x: sum(x) / len(x) if len(x) else 0.0
 
 
 def load_train_data() -> Dataset:

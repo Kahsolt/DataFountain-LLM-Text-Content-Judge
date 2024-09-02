@@ -9,7 +9,18 @@ from utils import *
 R_NOR_TASK = Regex('请以“(.+)”为主题写一篇文章')
 
 
-def judge_NOR_dummy(test_data:Dataset) -> Dataset:
+def judge_NOR_mean(test_data:Dataset) -> Dataset:
+  for segs in test_data:
+    id, quest, dim, content, score = segs
+    if dim == DIM_NOR:
+      if len(content) > 0:
+        segs[-1] = 3.509333333333333
+      else:   # fix special case (data missing)
+        segs[-1] = 5
+  return test_data
+
+
+def judge_NOR_random(test_data:Dataset) -> Dataset:
   # load data
   train_data = load_train_data()
   # analyze statis
@@ -19,6 +30,7 @@ def judge_NOR_dummy(test_data:Dataset) -> Dataset:
     if dim == DIM_NOR:
       scores_NOR.append(score)
   sc_NOR, p_NOR = samples_to_probdist(scores_NOR)
+  print('mean(sc_NOR):', mean(scores_NOR))    # mean diff: 1.1282986666666668
   print('p_NOR:', [round(e, 2) for e in p_NOR])
   # random baseline solution
   for segs in test_data:
