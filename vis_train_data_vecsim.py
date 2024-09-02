@@ -8,11 +8,10 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier, ExtraTreeClassifier
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, GradientBoostingClassifier, RandomForestRegressor
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, RandomForestRegressor
 from sklearn.naive_bayes import BernoulliNB, GaussianNB
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from sklearn.base import RegressorMixin
 from sklearn.metrics import precision_recall_fscore_support, confusion_matrix, mean_absolute_error
 import matplotlib.pyplot as plt
 
@@ -24,6 +23,7 @@ from utils import *
 data = load_file()
 data = [e for e in data if len(e['content']) > 0]
 VECSIM_MODELS = sorted(data[0]['cossim'].keys())
+VECSIM_MODELS = ['sentence-transformers/paraphrase-multilingual-mpnet-base-v2']
 
 
 ''' Feature '''
@@ -43,7 +43,7 @@ print('Y.shape:', Y.shape)
 
 
 ''' Visualize '''
-if not 'pca':
+if 'pca':
   pca = PCA(n_components=3)
   X_pca = pca.fit_transform(X)
   print('explained_variance_:', pca.explained_variance_)
@@ -87,7 +87,7 @@ for model_cls in [
   #AdaBoostClassifier,
   GradientBoostingClassifier,
 ]:
-  is_rgr = issubclass(model_cls, RegressorMixin)
+  is_rgr = model_cls == RandomForestRegressor
 
   print(f'[{model_cls.__name__}]')
   model = model_cls()

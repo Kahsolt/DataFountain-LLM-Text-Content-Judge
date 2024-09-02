@@ -53,7 +53,7 @@ def _raw_data_sanity_check(samples:Dataset):
     badcase = [e for e in samples if e[2] == dim and len(e[3]) == 0]
     print(f'  {dim}: {len(badcase)}')
 
-def load_train_data(filter:str=None) -> Dataset:
+def load_train_data(filter:str=None, ignore_empty_content:bool=False) -> Dataset:
   with open(TRAIN_DATA_FILE, encoding=FILE_ENCODING) as fh:
     samples: Dataset = []
     is_first = True
@@ -70,9 +70,11 @@ def load_train_data(filter:str=None) -> Dataset:
     samples = [e for e in samples if e[2] == dim_kanji]
   print('len(train_data):', len(samples))
   #_raw_data_sanity_check(samples)
+  if ignore_empty_content:
+    samples = [e for e in samples if len(e[3])]
   return samples
 
-def load_test_data(filter:str=None) -> Dataset:
+def load_test_data(filter:str=None, ignore_empty_content:bool=False) -> Dataset:
   with open(TEST_DATA_FILE, encoding=FILE_ENCODING) as fh:
     samples: Dataset = []
     is_first = True
@@ -89,6 +91,8 @@ def load_test_data(filter:str=None) -> Dataset:
     samples = [e for e in samples if e[2] == dim_kanji]
   print('len(test_data):', len(samples))
   #_raw_data_sanity_check(samples)
+  if ignore_empty_content:
+    samples = [e for e in samples if len(e[3])]
   return samples
 
 def save_infer_data(samples:Dataset, fp:Path=None):

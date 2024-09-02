@@ -30,6 +30,7 @@ try:
   while True:
     prompt = input('>> input: ').strip()
     if not prompt: continue
+    prompt = prompt.replace('\\n', '\n')
 
     messages = [
       {"role": "system", "content": "你是一个文本摘要小助手。"},
