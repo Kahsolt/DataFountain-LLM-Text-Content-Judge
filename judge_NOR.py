@@ -4,6 +4,12 @@
 
 # 规范性
 
+from typing import Dict, Any
+
+import joblib
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestRegressor
+
 from utils import *
 
 R_NOR_TASK = Regex('请以“(.+)”为主题写一篇文章')
@@ -37,6 +43,44 @@ def judge_NOR_random(test_data:Dataset) -> Dataset:
     id, quest, dim, content, score = segs
     if dim == DIM_NOR:
       segs[-1] = np.random.choice(sc_NOR, p=p_NOR)
+  return test_data
+
+
+scaler: StandardScaler = None
+model: RandomForestRegressor = None
+dsamples: List[Dict[str, Any]] = None
+
+VECSIM_MODELS = ['sentence-transformers/paraphrase-multilingual-mpnet-base-v2']
+
+def _load_env():    # load pretrained model & preprocessed data
+  from make_data_vecsim import load_file
+  global scaler, model, dsamples
+  if scaler is None:
+    scaler = joblib.load(OUT_PATH / 'vecsim-rescaler.pkl')
+  if model is None:
+    model = joblib.load(OUT_PATH / 'vecsim.pkl')
+  if dsamples is None:
+    dsamples = load_file(OUT_PATH / 'test_b_data_vecsim.json')
+
+def _infer(it:Dict[str, Any]) -> float:
+  sims: List[float] = [it['len']]
+  for metric in ['dotsim', 'cossim', 'aglsim']:
+    for m in VECSIM_MODELS:
+      sims.append(it[metric][m])
+  X = np.asarray([sims], dtype=np.float32)
+  X = scaler.transform(X)
+  pred = model.predict(X).item()
+  return pred
+
+def judge_NOR(test_data:Dataset) -> Dataset:
+  _load_env()   # load data
+  for segs in test_data:
+    id, quest, dim, content, score = segs
+    if dim == DIM_NOR:
+      it = next(filter(lambda e: e['id'] == id, dsamples))
+      y_pred = _infer(it)
+      sc = round(y_pred, 7)
+      segs[-1] = max(1, min(5, sc))
   return test_data
 
 

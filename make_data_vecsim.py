@@ -18,9 +18,18 @@ from judge_NOR import R_NOR_TASK
 from utils import *
 
 DATA_TRAIN_FILE = OUT_PATH / 'train_data_vecsim.json'
+DATA_TEST_B_FILE = OUT_PATH / 'test_b_data_vecsim.json'
 
 DSample = Dict[str, Any]
 DSamples = List[DSample]
+
+# Run Configs ↓↓↓
+if 'train':
+  load_data = load_train_data
+  save_fp = DATA_TRAIN_FILE
+else:   # test-B
+  load_data = load_test_B_data
+  save_fp = DATA_TEST_B_FILE
 
 
 # https://huggingface.co/spaces/mteb/leaderboard
@@ -36,6 +45,9 @@ EMBEDDING_MODEL_NAMES = [
   'infgrad/stella-base-zh-v3-1792d',          # 0.38GB
   #'Amu/tao-8k',                               # 0.62GB (not available)
   'jinaai/jina-embeddings-v2-base-zh',        # 322MB
+]
+EMBEDDING_MODEL_NAMES = [   # 只用这个一个就行了
+  'sentence-transformers/paraphrase-multilingual-mpnet-base-v2',    # 1.11GB
 ]
 
 
@@ -101,28 +113,46 @@ def make_vecsim_socre(samples:DSamples):
   save_file(samples)
 
 
-def load_file() -> DSamples:
-  with open(DATA_TRAIN_FILE, encoding='utf-8') as fh:
+def make_length(samples:DSamples):
+  model_path = 'internlm/internlm2_5-1_8b-chat'
+  tokenizer = AutoTokenizer.from_pretrained(
+    model_path,
+    trust_remote_code=True,
+  )
+
+  for idx, it in enumerate(tqdm(samples)):
+    it['len'] = len(tokenizer.encode(it['content']))
+
+    if (idx + 1) % 100 == 0:
+      save_file(samples)
+
+  save_file(samples)
+
+
+def load_file(fp:Path=None) -> DSamples:
+  fp = fp or save_fp
+  with open(fp, encoding='utf-8') as fh:
     return json.load(fh)
 
 
 def save_file(samples:DSamples):
-  with open(DATA_TRAIN_FILE, 'w', encoding='utf-8') as fh:
+  with open(save_fp, 'w', encoding='utf-8') as fh:
     json.dump(samples, fh, indent=2, ensure_ascii=False)
 
 
 def run():
-  data = load_train_data('NOR')
+  data = load_data('NOR')
   print('n_samples:', len(data))
 
-  if DATA_TRAIN_FILE.exists():
-    with open(DATA_TRAIN_FILE, encoding='utf-8') as fh:
+  if save_fp.exists():
+    with open(save_fp, encoding='utf-8') as fh:
       samples = json.load(fh)
   else:
     samples = [{
       'id':      e[0],
       'quest':   R_NOR_TASK.search(e[1]).groups()[0],   # 原题目要求
       'content': e[3],          # 大模型输出
+      'len':     None,          # 大模型输出 token 数
       'score':   e[4],          # 人类评分
       'content_skel':  None,    # 大模型输出
       'dotsim':  {},            # 各句向量模型对 quest 和 content_skel 的相似度打分
@@ -136,6 +166,9 @@ def run():
 
     print('>> [Run] make_vecsim_socre...')
     make_vecsim_socre(samples)
+
+    print('>> [Run] make_length...')
+    make_length(samples)
   finally:
     save_file(samples)
 

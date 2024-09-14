@@ -2,9 +2,8 @@
 .vscode/
 __pycache__/
 
-# logs
-log/
-*.log
+# reproducible outputs
+out/*.html
 
 # info
 TEAM.txt
