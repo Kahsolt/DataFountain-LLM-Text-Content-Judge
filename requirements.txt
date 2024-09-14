@@ -2,3 +2,6 @@ transformers
 sentence_transformers
 xlrd==1.2.0
 ydata_profiling
+
+#pycorrector
+#pyahocorasick

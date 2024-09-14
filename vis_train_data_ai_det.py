@@ -8,6 +8,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.linear_model import LinearRegression, Lasso, Lars
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.base import RegressorMixin
 from sklearn.metrics import mean_absolute_error
@@ -37,6 +38,9 @@ print('Y.shape:', Y.shape)
 ''' Visualize '''
 if 'scatter':
   plt.scatter(X, Y)
+  plt.suptitle('AI detector')
+  plt.xlabel('ai_det score')
+  plt.ylabel('human score')
   plt.tight_layout()
   plt.show()
 
@@ -58,6 +62,7 @@ for model_cls in [
   LinearRegression,
   Lasso,
   Lars,
+  RandomForestRegressor,
 ]:
   print(f'[{model_cls.__name__}]')
   model = model_cls()
