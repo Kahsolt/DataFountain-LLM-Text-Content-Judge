@@ -11,12 +11,14 @@ from typing import Tuple, List
 
 import torch
 import numpy as np
+import xlrd
 
 BASE_PATH = Path(__file__).parent
 DATA_PATH = BASE_PATH / 'data'
 OUT_PATH = BASE_PATH / 'out'
-TRAIN_DATA_FILE = DATA_PATH / 'train.csv'   # n_samples: 3500 = 1500 + 1500 + 500
-TEST_DATA_FILE  = DATA_PATH / 'test.csv'    # n_samples: 3049 = 1000 + 1000 + 1049
+TRAIN_DATA_FILE = DATA_PATH / 'train.csv'      # n_samples: 3500 = 1500 + 1500 + 500
+TEST_DATA_FILE  = DATA_PATH / 'test.csv'       # n_samples: 3049 = 1000 + 1000 + 1049
+TEST_B_DATA_FILE  = DATA_PATH / 'test-B.xlsx'  # n_samples: 2750 = 1000 + 1000 + 750
 DEFAULT_OUT_FILE = OUT_PATH / 'submit.csv'
 FILE_ENCODING = 'gb18030'                   # gb2312 < gbk < gb18030
 
@@ -47,7 +49,7 @@ mean = lambda x: sum(x) / len(x) if len(x) else 0.0
 
 
 def _raw_data_sanity_check(samples:Dataset):
-  ''' 仅 规范性NOR 有空缺: 25(train)/24(test)，标签都是 5 分'''
+  ''' 仅 规范性NOR 有空缺: 25(train)/24(test)/0(test-B)，train 中的标签都是 5 分'''
   print('>> [_raw_data_sanity_check] Empty llm output samples:')
   for dim in DIM_LIST:
     badcase = [e for e in samples if e[2] == dim and len(e[3]) == 0]
@@ -82,6 +84,26 @@ def load_test_data(filter:str=None, ignore_empty_content:bool=False) -> Dataset:
       if is_first:
         is_first = False
         continue
+      assert len(segs) == 4, breakpoint()
+      id, quest, dim, content = segs
+      assert dim in DIM_LIST, breakpoint()
+      samples.append([id, quest, dim, content, None])   # use list here to allow inplace-modify :)
+  if filter is not None:
+    dim_kanji = DIM_MAPPING[filter]
+    samples = [e for e in samples if e[2] == dim_kanji]
+  print('len(test_data):', len(samples))
+  #_raw_data_sanity_check(samples)
+  if ignore_empty_content:
+    samples = [e for e in samples if len(e[3])]
+  return samples
+
+def load_test_B_data(filter:str=None, ignore_empty_content:bool=False) -> Dataset:
+  samples: Dataset = []
+  with xlrd.open_workbook(TEST_B_DATA_FILE) as wb:
+    sheet = wb.sheets()[0]
+    print('sheet.shape:', (sheet.nrows, sheet.ncols))
+    for row in range(1, sheet.nrows):
+      segs = sheet.row_values(row)
       assert len(segs) == 4, breakpoint()
       id, quest, dim, content = segs
       assert dim in DIM_LIST, breakpoint()
