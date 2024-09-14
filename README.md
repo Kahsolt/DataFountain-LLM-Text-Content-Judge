@@ -6,6 +6,7 @@
 
 Contest page: https://www.datafountain.cn/competitions/1032  
 Team Name: 你也是龙  
+Final Rank: 8th, no award
 
 
 ### Quickstart
@@ -29,8 +30,8 @@ Our final solution for each task:
 | method | submit score ↑ | data split |
 | :-: | :-: | :-: |
 | random | 0.43252595156 | rank A |
-| mean   | 0.49980007997 | rank A |
-| final  |               | rank B |
+| mean   | 0.49980007997 | rank A (21th)|
+| final  | 0.49142464    | rank B (8th) |
 
 
 ----
