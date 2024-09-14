@@ -6,19 +6,22 @@
 
 from judge_FLU import judge_FLU_random, judge_FLU_mean
 from judge_NOR import judge_NOR_random, judge_NOR_mean
-from judge_CHC import judge_CHC
+from judge_CHC import judge_CHC, R_CHC_ANS_TMPL_LIST_HIT, R_CHC_NOANS_TMPL_LIST_HIT
 
 from utils import *
 
 
 def run():
   # load data
-  test_data = load_test_data()
+  test_data = load_test_B_data()
 
   # make judgements, devide & conquer
   test_data = judge_FLU_mean(test_data)
   test_data = judge_NOR_mean(test_data)
   test_data = judge_CHC(test_data)
+
+  print('R_CHC_ANS_TMPL_LIST_HIT:', R_CHC_ANS_TMPL_LIST_HIT)
+  print('R_CHC_NOANS_TMPL_LIST_HIT:', R_CHC_NOANS_TMPL_LIST_HIT)
 
   # save file
   save_infer_data(test_data)
